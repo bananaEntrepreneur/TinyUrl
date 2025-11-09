@@ -1,0 +1,20 @@
+# Environment Configuration
+ENV_NAME="Development"
+
+# Application Settings
+BASE_URL="http://127.0.0.1:8000"
+
+# Database Configuration
+DB_URL="sqlite:///./shortener.db"
+
+# Security Settings
+# SECRET_KEY="your-super-secret-key-here"
+# ALGORITHM="HS256"
+# ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Redis Configuration
+# REDIS_URL="redis://localhost:6379"
+
+# Application Behavior
+# DEFAULT_SHORT_CODE_LENGTH=6
+# MAX_RETRIES=3
