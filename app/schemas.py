@@ -4,27 +4,6 @@ class URLBase(BaseModel):
     """Base schema for URL"""
     target_url: HttpUrl # URL validation with built-in Pydantic HttpUrl
 
-    @field_validator('target_url')
-    @classmethod
-    def validate_target_url(cls, value: HttpUrl) -> HttpUrl:
-        """
-        Validate target URL for safety and compatibility.
-
-        Args:
-            v: The URL to validate
-
-        Returns:
-            Validated URL
-
-        Raises:
-            ValueError: If URL is not allowed or invalid
-        """
-        # Example validation: prevent redirects to same domain to avoid loops
-        forbidden_domains = ['localhost', '127.0.0.1', '0.0.0.0']
-        if any(domain in str(value) for domain in forbidden_domains):
-            raise ValueError('Redirects to local domains are not allowed')
-        return value
-
 class URL(URLBase):
     """
     Main URL schema for database operations and API responses.

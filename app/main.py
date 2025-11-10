@@ -44,16 +44,14 @@ async def read_root() -> dict:
         "status": "active"
     }
 
-@app.post("/url", response_model=schemas.Url)
-def create_url(url: schemas.URLBase, db: Session = Depends(get_db())):
-    if not validators.url(url.target_url):
-        raise_bad_request(message="Your provided URL is not valid")
 
+@app.post("/url", response_model=schemas.URLInfo)
+def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     key = "".join(secrets.choice(chars) for _ in range(5))
     secret_key = "".join(secrets.choice(chars) for _ in range(8))
 
-    db_url = models.Url(
+    db_url = models.URL(
         target_url=url.target_url,
         key=key,
         secret_key=secret_key
