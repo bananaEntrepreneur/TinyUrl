@@ -4,6 +4,12 @@ class URLBase(BaseModel):
     """Base schema for URL"""
     target_url: HttpUrl # URL validation with built-in Pydantic HttpUrl
 
+    @field_validator('target_url')
+    @classmethod
+    def convert_httpurl_to_str(cls, v: HttpUrl) -> str:
+        """Convert HttpUrl to string for storaging in DB"""
+        return str(v)
+
 class URL(URLBase):
     """
     Main URL schema for database operations and API responses.
