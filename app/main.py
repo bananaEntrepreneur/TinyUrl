@@ -1,8 +1,22 @@
-from fastapi import FastAPI, HTTPException, status
-from . import schemas
+import secrets
+
+from fastapi import FastAPI, HTTPException, status, Depends
+from sqlalchemy.orm import Session
 import validators
 
+from . import schemas, models
+from .database import SessionLocal, engine
+
 app = FastAPI()
+models.Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 def raise_bad_request(message: str) -> None:
     """
@@ -30,8 +44,24 @@ async def read_root() -> dict:
         "status": "active"
     }
 
-@app.post("/url")
-def create_short_url(url: schemas.URLBase) -> str:
+@app.post("/url", response_model=schemas.Url)
+def create_url(url: schemas.URLBase, db: Session = Depends(get_db())):
     if not validators.url(url.target_url):
         raise_bad_request(message="Your provided URL is not valid")
-    return f"TODO: Create database entry for {url.target_url}"
+
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    key = "".join(secrets.choice(chars) for _ in range(5))
+    secret_key = "".join(secrets.choice(chars) for _ in range(8))
+
+    db_url = models.Url(
+        target_url=url.target_url,
+        key=key,
+        secret_key=secret_key
+    )
+    db.add(db_url)
+    db.commit()
+    db.refresh(db_url)
+    db_url.url = key
+    db_url.admin_url = secret_key
+
+    return db_url
