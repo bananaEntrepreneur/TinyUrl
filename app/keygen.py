@@ -5,11 +5,29 @@ from . import crud
 
 
 def create_random_key(length: int = 5) -> str:
-    chars = string.ascii_uppercase + string.digits
+    """
+    Creates a random key and returns it.
+
+    Args:
+        length: Key length (default: 5)
+
+    Returns:
+        Random key
+    """
+    chars = string.ascii_letters + string.digits
     return "".join(secrets.choice(chars) for _ in range(length))
 
 
 def create_unique_random_key(db: Session) -> str:
+    """
+    Creates a unique key for short url and returns it.
+
+    Args:
+        db: Database session
+
+    Returns:
+        Unique key
+    """
     key = create_random_key()
     while crud.get_db_url_by_key(db, key):
         key = create_random_key()
