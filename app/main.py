@@ -22,11 +22,6 @@ def get_db():
         db.close()
 
 
-def raise_not_found(request: Request):
-    message = f"URL '{request.url}' doesn't exist."
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
-
-
 def raise_bad_request(message: str) -> None:
     """
     Raise HTTP 400 Bad Request exception with custom message.
@@ -36,6 +31,20 @@ def raise_bad_request(message: str) -> None:
     """
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
+        detail=message
+    )
+
+
+def raise_not_found(request: Request):
+    """
+    Raise HTTP 404 Not Found exception with custom message.
+
+    Args:
+        message: Detailed error description for the client
+    """
+    message = f"URL '{request.url}' doesn't exist."
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
         detail=message
     )
 
@@ -59,7 +68,7 @@ async def read_root() -> dict:
     """
     return {
         "message": "Welcome to the URL shortener API :)",
-        "version": "0.1",
+        "version": "1.0",
         "status": "active"
     }
 
@@ -67,6 +76,21 @@ async def read_root() -> dict:
 def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     db_url = crud.create_db_url(db=db, url=url)
     return get_admin_info(db_url=db_url)
+
+@app.post("/custom_url", response_model=schemas.URLInfo)
+def create_custom_url(
+        custom_url: schemas.URLCustom,
+        db: Session = Depends(get_db)
+):
+    try:
+        db_custom_url = crud.create_custom_db_url(
+            db=db,
+            url=custom_url,
+            custom_key=custom_url.custom_key
+        )
+        return get_admin_info(db_url=db_custom_url)
+    except Exception as error:
+        raise_bad_request(message=str(error))
 
 @app.get("/{url_key}")
 def forward_to_target_url(

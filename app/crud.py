@@ -16,6 +16,38 @@ def create_db_url(db: Session, url: schemas.URLBase) -> models.URL :
     return db_url
 
 
+def create_custom_db_url(db: Session, url: schemas.URLBase, custom_key: str) -> models.URL:
+    """
+    Create custom URL with key
+
+    Args:
+        db: Database session
+        url: URLBase object with target_url
+        custom_key: Custom key for short url
+
+    Returns:
+        Created URL record
+    """
+    custom_url_in_db = (
+        db.query(models.URL)
+        .filter(models.URL.key == custom_key)
+        .first()
+    )
+    if not custom_url_in_db:
+        secret_key = f"{custom_key}_{keygen.create_random_key(length=8)}"
+        db_custom_url = models.URL(
+            target_url=str(url.target_url),
+            key=custom_key,
+            secret_key=secret_key
+        )
+        db.add(db_custom_url)
+        db.commit()
+        db.refresh(db_custom_url)
+        return db_custom_url
+    else:
+        raise Exception(f"Key {custom_key} already exists")
+
+
 def get_db_url_by_key(db: Session, url_key: str) -> models.URL :
     return (
         db.query(models.URL)
