@@ -1,12 +1,13 @@
-import secrets
 from urllib import request
 
 from fastapi import FastAPI, HTTPException, status, Depends, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
+from starlette.datastructures import URL
 
 from . import schemas, models, crud
 from .database import SessionLocal, engine
+from .config import get_settings
 
 
 app = FastAPI()
@@ -38,6 +39,16 @@ def raise_bad_request(message: str) -> None:
         detail=message
     )
 
+
+def get_admin_info(db_url: models.URL) -> schemas.URLInfo:
+    base_url = URL(get_settings().base_url)
+    admin_endpoint = app.url_path_for(
+        "administration info", secret_key=db_url.secret_key
+    )
+    db_url.url = str(base_url.replace(path=db_url.key))
+    db_url.admin_url = str(base_url.replace(path=admin_endpoint))
+    return db_url
+
 @app.get("/")
 async def read_root() -> dict:
     """
@@ -55,11 +66,7 @@ async def read_root() -> dict:
 @app.post("/url", response_model=schemas.URLInfo)
 def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     db_url = crud.create_db_url(db=db, url=url)
-
-    db_url.url = db_url.key
-    db_url.admin_url = db_url.secret_key
-
-    return db_url
+    return get_admin_info(db_url=db_url)
 
 @app.get("/{url_key}")
 def forward_to_target_url(
@@ -82,8 +89,6 @@ def forward_to_target_url(
          response_model=schemas.URLInfo)
 def get_url_info(secret_key: str, db: Session = Depends(get_db)):
     if db_url := crud.get_db_url_by_secret_key(db=db, secret_key=secret_key):
-        db_url.url = db_url.key
-        db_url.admin_url = db_url.secret_key
-        return db_url
+        return get_admin_info(db_url=db_url)
     else:
         raise_not_found(request)
