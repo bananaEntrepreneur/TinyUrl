@@ -1,16 +1,10 @@
 from typing import Generator
 from sqlalchemy.orm import Session
-from ..database import SessionLocal
+from ..core.config import get_session_local
 
 
 def get_db() -> Generator[Session, None, None]:
-    """
-    Database dependency that provides database sessions to API endpoints.
-
-    Yields:
-        Session: Database session for the request
-    """
-    db = SessionLocal()
+    db = get_session_local()
     try:
         yield db
     finally:

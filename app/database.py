@@ -1,18 +1,8 @@
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from .core.config import get_session_local, get_engine
 
-from .core.config import get_settings
-
-engine = create_engine(
-    get_settings().db_url,
-    connect_args={"check_same_thread": False}
-)
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
+engine = get_engine()
+SessionLocal = get_session_local
 Base = declarative_base()
 
 def get_db():

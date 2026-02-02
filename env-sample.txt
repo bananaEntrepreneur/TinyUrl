@@ -1,20 +1,7 @@
-# Environment Configuration
-ENV_NAME="Development"
-
-# Application Settings
+ENV_NAME="Dev"
 BASE_URL="http://127.0.0.1:8000"
-
-# Database Configuration
-DB_URL="sqlite:///./shortener.db"
-
-# Security Settings
-# SECRET_KEY="your-super-secret-key-here"
-# ALGORITHM="HS256"
-# ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Redis Configuration
-# REDIS_URL="redis://localhost:6379"
-
-# Application Behavior
-# DEFAULT_SHORT_CODE_LENGTH=6
-# MAX_RETRIES=3
+DB_URL=postgresql://postgres:password@db:5432/tiny_url
+REDIS_URL="redis://redis:6379/0"
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=tiny_url
