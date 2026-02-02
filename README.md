@@ -1,15 +1,28 @@
 # TinyUrl Service
 
-FastAPI-based high-performance URL shortening service with load balancing and caching.
+FastAPI-based high-performance URL shortening service.
 
-## Features
+## Quick Start
 
-- 🔗 Create short URLs
-- 📊 Advanced analytics with real-time tracking
-- ⚖️ Load balancing with Nginx
-- 🗃️ Redis caching for high performance
-- 🐳 Docker containerization
-- 🔒 Security best practices
-- 🚀 FastAPI with async support
-- 💾 PostgreSQL with connection pooling
-- 📈 Monitoring and metrics
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd tiny_url
+   ```
+
+2. Copy the environment sample file:
+   ```bash
+   cp env-sample.txt .env
+   ```
+   
+   Edit `.env` file with your desired configuration.
+
+3. Start the services:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Access the application:
+   - API: http://localhost:8000
+   - Documentation: http://localhost:8000/docs
+   - Health Check: http://localhost:8000/health
